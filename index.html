@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viachaslau Strelnikau &mdash; Backend / Full-Stack Developer (Java, Spring)</title>
+<meta name="description" content="Backend / Full-Stack Developer with 8+ years of hands-on software development experience in logistics and cross-border cargo systems.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%92%BB%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --panel:#f7f8fa; --ink:#1c2024; --muted:#5b6572;
+  --line:#e2e6ea; --accent:#1f4e79; --accent-soft:#eaf1f8; --chip:#eef1f4;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#14171a; --panel:#1b1f24; --ink:#e6e9ec; --muted:#9aa5b1;
+    --line:#2a3038; --accent:#7fb3e0; --accent-soft:#1d2a36; --chip:#232931;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.page{max-width:880px; margin:0 auto; padding:48px 24px 72px}
+
+/* ---- header ---- */
+header{border-bottom:3px solid var(--accent); padding-bottom:22px; margin-bottom:34px}
+h1{
+  margin:0 0 6px; font-size:34px; line-height:1.15; letter-spacing:.02em;
+  font-weight:700; text-transform:uppercase;
+}
+.role{margin:0 0 16px; font-size:18px; color:var(--accent); font-weight:600}
+.contact{margin:0 0 4px; font-size:15px; color:var(--muted); word-break:break-word}
+.contact a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
+.contact a:hover{border-bottom-color:currentColor}
+.sep{opacity:.5; padding:0 6px}
+.location{margin:0; font-size:15px; color:var(--muted)}
+.actions{margin-top:20px}
+.btn{
+  display:inline-block; padding:10px 18px; border-radius:6px;
+  background:var(--accent); color:#fff; text-decoration:none;
+  font-size:15px; font-weight:600; border:1px solid var(--accent);
+}
+.btn:hover{filter:brightness(1.1)}
+@media (prefers-color-scheme:dark){ .btn{color:#14171a} }
+
+/* ---- sections ---- */
+section{margin-bottom:36px}
+h2{
+  margin:0 0 16px; font-size:13px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
+  padding-bottom:7px; border-bottom:1px solid var(--line);
+}
+p{margin:0 0 12px}
+section p:last-child{margin-bottom:0}
+
+/* ---- skills ---- */
+.skill-row{display:flex; gap:16px; margin-bottom:14px; flex-wrap:wrap}
+.skill-label{
+  flex:0 0 190px; font-weight:700; font-size:14px;
+  padding-top:4px; color:var(--ink);
+}
+.chips{display:flex; flex-wrap:wrap; gap:6px; flex:1 1 320px}
+.chip{
+  background:var(--chip); border:1px solid var(--line); border-radius:4px;
+  padding:3px 9px; font-size:13.5px; white-space:nowrap;
+}
+@media (max-width:620px){ .skill-label{flex-basis:100%; padding-top:0} }
+
+/* ---- experience ---- */
+.job{margin-bottom:14px}
+/* a later employer heading follows the previous employer's last project */
+.project + .job{margin-top:32px; padding-top:22px; border-top:1px solid var(--line)}
+.head{
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:12px; flex-wrap:wrap;
+}
+.job .title{font-size:20px; font-weight:700; margin:0}
+.dates{font-size:14px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums}
+.stack{margin:4px 0 0; font-size:14.5px; color:var(--muted)}
+
+.project{
+  border-left:3px solid var(--line); padding:0 0 2px 18px;
+  margin:24px 0 0; break-inside:avoid;
+}
+.project .title{font-size:16.5px; font-weight:700; margin:0; color:var(--accent)}
+.intro{margin:8px 0 10px; font-size:15px}
+.project ul{margin:0; padding-left:20px}
+.project li{margin-bottom:6px; font-size:15px}
+.env{
+  margin:12px 0 0; padding:8px 12px; background:var(--accent-soft);
+  border-radius:4px; font-size:13.5px; color:var(--muted);
+}
+.env b{color:var(--ink)}
+
+/* ---- lists ---- */
+ul.plain{margin:0; padding-left:20px}
+ul.plain li{margin-bottom:6px}
+.note{margin-top:12px; font-size:14.5px; color:var(--muted)}
+
+/* ---- print ---- */
+@media print{
+  :root{
+    --bg:#fff; --panel:#fff; --ink:#000; --muted:#444;
+    --line:#bbb; --accent:#1f4e79; --accent-soft:#f0f4f8; --chip:#f2f2f2;
+  }
+  body{font-size:10.5pt}
+  .page{max-width:none; padding:0}
+  .actions{display:none}
+  h1{font-size:22pt}
+  .role{font-size:12pt}
+  section{margin-bottom:16px; break-inside:auto}
+  .project,.skill-row,.job{break-inside:avoid}
+  h2{break-after:avoid}
+  a{color:inherit; text-decoration:none}
+}
+</style>
+</head>
+<body>
+<main class="page">
+<header>
+  <h1>VIACHASLAU STRELNIKAU</h1>
+  <p class="role">Backend / Full-Stack Developer (Java, Spring)</p>
+  <p class="contact"><a href="mailto:viachaslau.strelnikau@gmail.com">viachaslau.strelnikau@gmail.com</a><span class="sep">&middot;</span><a href="https://www.linkedin.com/in/vvs85" rel="me noopener">linkedin.com/in/vvs85</a><span class="sep">&middot;</span><a href="https://gitlab.com/viachaslau.strelnikau" rel="me noopener">gitlab.com/viachaslau.strelnikau</a></p>
+  <p class="location">Brest, Belarus  •  open for office/ hybrid/ remote work</p>
+  <p class="actions"><a class="btn" href="Viachaslau_Strelnikau_CV_EN.docx" download>&#8659;&nbsp; Download CV (DOCX)</a></p>
+</header>
+<section id="summary">
+  <h2>SUMMARY</h2>
+  <p>Backend / Full-Stack Developer with 8+ years of hands-on software development experience in logistics and cross-border cargo systems. Strong in Java, Spring / Spring Boot, Hibernate, SQL and REST APIs.</p>
+  <p>Experienced in document-driven enterprise applications, complex Excel/PDF processing workflows, Angular and Ext JS frontends, and native Android applications for logistics terminals. Work has covered end-to-end feature development, legacy system modernization, SQL/Hibernate query optimization, document import/export and reporting, role-based access control, third-party API integrations and production issue investigation.</p>
+  <p>Currently working on an AI-first modernization of a large legacy Struts2 application toward Spring REST APIs, using structured agentic workflows for codebase analysis, migration planning, refactoring, test generation and code review.</p>
+</section>
+<section id="skills">
+  <h2>SKILLS</h2>
+  <div class="skill-row">
+    <div class="skill-label">Backend</div>
+    <div class="chips"><span class="chip">Java</span><span class="chip">Spring Framework</span><span class="chip">Spring Boot</span><span class="chip">Spring Security</span><span class="chip">Hibernate</span><span class="chip">JPA</span><span class="chip">Struts2</span><span class="chip">REST APIs</span><span class="chip">SQL</span><span class="chip">MySQL</span><span class="chip">JUnit</span><span class="chip">Maven</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Frontend</div>
+    <div class="chips"><span class="chip">Angular 18</span><span class="chip">TypeScript</span><span class="chip">Angular Material</span><span class="chip">RxJS</span><span class="chip">Reactive Forms</span><span class="chip">ngx-translate</span><span class="chip">Ext JS</span><span class="chip">HTML</span><span class="chip">CSS</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Mobile</div>
+    <div class="chips"><span class="chip">Native Android (Java)</span><span class="chip">Android SDK</span><span class="chip">Material Design</span><span class="chip">RecyclerView</span><span class="chip">Gradle</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Integrations &amp; documents</div>
+    <div class="chips"><span class="chip">Apache POI</span><span class="chip">iText</span><span class="chip">Google Cloud Vision</span><span class="chip">IBM Watson Translator</span><span class="chip">Telegram Bot API</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">DevOps &amp; CI/CD</div>
+    <div class="chips"><span class="chip">Git</span><span class="chip">GitLab</span><span class="chip">GitHub</span><span class="chip">Docker</span><span class="chip">Docker Compose</span><span class="chip">GitHub Actions</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">AI-assisted development</div>
+    <div class="chips"><span class="chip">Claude Code</span><span class="chip">ChatGPT</span><span class="chip">agentic workflows</span><span class="chip">context engineering</span><span class="chip">MCP</span><span class="chip">agent skills</span><span class="chip">specification-driven development</span></div>
+  </div>
+  <div class="skill-row">
+    <div class="skill-label">Working knowledge</div>
+    <div class="chips"><span class="chip">Kubernetes</span><span class="chip">Helm</span><span class="chip">Apache Kafka</span><span class="chip">PostgreSQL</span></div>
+  </div>
+</section>
+<section id="experience">
+  <h2>EXPERIENCE</h2>
+  <div class="job">
+    <div class="head"><p class="title">Full Stack Developer — Transinform</p><span class="dates">2018 – Present</span></div>
+  </div>
+    <p class="stack">Java / Spring / Ext JS / Angular / Android · logistics and cross-border cargo systems</p>
+  <div class="project">
+    <div class="head"><p class="title">WGR — cross-border cargo documentation platform</p><span class="dates">2018 – Present</span></div>
+    <p class="intro">Web application for managing cross-border cargo documentation and logistics workflows, including CIM/SMGS waybills, invoices, customs and operational documents. Used by clients in Belarus, Germany, Poland, Kazakhstan and Russia.</p>
+    <ul>
+      <li>Currently working on an AI-first modernization migrating Struts2 functionality toward Spring REST APIs. The initial migration scope covers 174 active Struts routes and 158 Struts action classes, supported by a structured migration catalog, compatibility rules and automated contract verification.</li>
+      <li>Applied AI-assisted and agentic development practices across codebase analysis, migration planning, implementation, test generation and code review, backed by 500+ Spring web regression tests validating migrated and compatibility paths while preserving existing production behavior.</li>
+      <li>Implemented a Google Cloud Vision-based OCR workflow for logistics documents, tested on 1,000+ real documents with approximately 98% recognition accuracy; the solution has run in production for around 3 years with minimal adjustments.</li>
+      <li>Implemented document processing workflows for CIM/SMGS waybills, invoices and related operational documents, including complex Excel import/export and partner-specific formats using Apache POI.</li>
+      <li>Developed PDF generation, printing and reporting functionality using iText, including a configurable stamp editor for waybills and related forms.</li>
+      <li>Developed modules for loading/unloading operations, yard management, truck and train workflows, container movements and operational reporting, together with Ext JS interfaces for dispatchers.</li>
+      <li>Optimized SQL and Hibernate queries, investigated production issues and improved validation and error handling for real-world logistics scenarios.</li>
+      <li>Created a DocumentGenerator utility using Java reflection and Hibernate metadata to generate realistic test documents, improving regression testing and reducing manual test-data preparation.</li>
+      <li>Implemented administration functionality including multi-user CRUD operations, bulk user import from Excel, reference-data management and role/permission-based access control.</li>
+      <li>Contributed to multilingual UI support and worked closely with developers, the team lead and end users to clarify requirements and improve existing workflows.</li>
+    </ul>
+    <p class="env"><b>Environment:</b> Java, Spring Framework, Spring Security, Struts2, Hibernate, MySQL, REST, Apache POI, iText, Ext JS, Google Cloud Vision, HTML, CSS, JUnit, Maven, Git.</p>
+  </div>
+  <div class="project">
+    <div class="head"><p class="title">WGR Mobile — Android client for a cargo container terminal</p><span class="dates">2020 – 2022, 2025</span></div>
+    <p class="intro">Native Android application used by gate and yard operators to handle truck and train check-in/check-out operations and manage container movements across terminal locations.</p>
+    <ul>
+      <li>Developed and maintained the Android client in Java, replacing a slower legacy hybrid mobile interface.</li>
+      <li>Designed the application to work reliably on resource-constrained handheld devices, including Android 5 devices with single-core CPUs and 1 GB of RAM.</li>
+      <li>Optimized JSON DTO models, payload serialization, networking and screen rendering to reduce transferred data and improve response and loading times on terminal devices.</li>
+      <li>Developed reusable RecyclerView-based grid and tree components for displaying large operational datasets.</li>
+      <li>Built a GitHub Actions CI/CD pipeline for automated Android builds and releases, including multi-variant/product-flavor builds, dependency caching and publishing release artifacts to a dedicated release repository.</li>
+      <li>Implemented and extended operational workflows for inbound/outbound trucks and trains and container movements between terminal locations.</li>
+      <li>Improved search, filtering, scrolling and UI controls to make the application easier to use on handheld scanners and industrial devices.</li>
+      <li>Implemented reliable state restoration and programmatic language switching for multilingual terminal users.</li>
+      <li>Modernized the project in 2025 by migrating to a newer Gradle / Android build toolchain, updating Android SDK compatibility, resolving runtime permission issues and stabilizing release builds.</li>
+      <li>Introduced multiple product flavors and customer-specific branding/configuration, including a dedicated workflow for security personnel.</li>
+      <li>Continuously refactored legacy code and investigated production performance and stability issues.</li>
+    </ul>
+    <p class="env"><b>Environment:</b> Java, Android SDK, Material Design, RecyclerView, REST/JSON, Gradle, GitHub Actions, Git.</p>
+  </div>
+  <div class="project">
+    <div class="head"><p class="title">WGR Angular — modernization of the WGR web interface</p><span class="dates">2023 – 2024</span></div>
+    <p class="intro">Angular-based modernization of the WGR web interface, gradually replacing selected legacy Ext JS workflows while integrating with the existing Java/Spring/Hibernate backend.</p>
+    <ul>
+      <li>Developed frontend modules using Angular 18, TypeScript, Angular Material and RxJS.</li>
+      <li>Implemented a modular application structure with feature modules, shared components and services, lazy-loaded routes and route guards.</li>
+      <li>Developed complex CIM/SMGS document workflows using reactive forms, validation and Angular Material dialogs, including nested wagon, container, cargo, carrier and related document data.</li>
+      <li>Integrated the Angular application with the existing legacy backend using HttpClient while preserving existing business logic and server-side workflows.</li>
+      <li>Implemented reusable UI components for data tables, toolbars, search fields, dialogs, reference-data selectors and language switching.</li>
+      <li>Added authentication flow, route protection and centralized HTTP error/session handling using Angular guards and interceptors.</li>
+      <li>Implemented multilingual UI support using ngx-translate and reusable translation infrastructure.</li>
+      <li>Implemented document operations including creation, editing, saving, save-and-exit and PDF preview, as well as client-side business calculations and data transformation required by existing WGR workflows.</li>
+    </ul>
+    <p class="env"><b>Environment:</b> TypeScript, Angular 18, Angular Material, RxJS, Reactive Forms, HttpClient, ngx-translate, HTML, CSS, Git.</p>
+  </div>
+  <div class="project">
+    <div class="head"><p class="title">WGR Slots — terminal arrival slot reservation app</p><span class="dates">2025</span></div>
+    <p class="intro">Angular web application for truck drivers to reserve arrival time slots at a container terminal.</p>
+    <ul>
+      <li>Developed a responsive single-page application using Angular 18, TypeScript and Angular Material.</li>
+      <li>Implemented a multi-step validation flow based on PIN code and container number before allowing slot reservation.</li>
+      <li>Integrated the frontend with existing backend REST APIs for validation, available-slot retrieval and reservation.</li>
+      <li>Developed a calendar-based date and time slot selection interface using Angular Material components.</li>
+      <li>Implemented multilingual UI support for Polish and Russian using ngx-translate.</li>
+      <li>Added UX features including loading indicators, snackbar error notifications and clear validation feedback.</li>
+      <li>Implemented export of confirmed reservations to .ics calendar files.</li>
+      <li>Developed responsive layouts using CSS and media queries to support desktop, tablet and mobile devices.</li>
+    </ul>
+    <p class="env"><b>Environment:</b> TypeScript, Angular 18, Angular Material, RxJS, HttpClient, ngx-translate, HTML, CSS, REST APIs, Git.</p>
+  </div>
+  <div class="job">
+    <div class="head"><p class="title">System Administrator</p><span class="dates">2007 – 2018</span></div>
+  </div>
+    <p class="stack">Windows / Active Directory domain of 100+ machines, network infrastructure, user support and production troubleshooting. Background that carries into deployment, networking and production debugging work today.</p>
+</section>
+<section id="education">
+  <h2>EDUCATION</h2>
+  <div class="head"><p class="title">Systems Engineer — Brest State Technical University</p><span class="dates">2002 – 2007</span></div>
+</section>
+<section id="languages">
+  <h2>LANGUAGES</h2>
+  <p>English — B2 (Upper-Intermediate)  ·  Russian — Native  ·  Polish — Beginner</p>
+</section>
+<section id="courses">
+  <h2>SELECTED COURSES &amp; CERTIFICATIONS</h2>
+  <ul class="plain">
+    <li>Anthropic: Claude Code in Action, Claude Code 101, Introduction to Agent Skills, Introduction to Subagents, Model Context Protocol: Advanced Topics</li>
+    <li>Spring Security 6 Zero to Master with JWT, OAuth2</li>
+    <li>Spring Boot 3, Spring 6 &amp; Hibernate</li>
+    <li>Spring Boot Unit Testing with JUnit, Mockito and MockMvc</li>
+    <li>Apache Kafka for Developers using Spring Boot</li>
+    <li>Docker &amp; Kubernetes: The Practical Guide</li>
+    <li>GitHub Actions — The Complete Guide</li>
+  </ul>
+  <p class="note">Additional courses in Java multithreading, microservices, SQL/PostgreSQL, Angular and reactive Spring.</p>
+</section>
+</main>
+</body>
+</html>
