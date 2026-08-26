@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case study &mdash; Migrating 600+ routes from Struts 2 to Spring</title>
+<meta name="description" content="How a large legacy Java web application was moved from Struts 2 to Spring MVC one route at a time, with no rewrite and no downtime.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%92%BB%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --panel:#f7f8fa; --ink:#1c2024; --muted:#5b6572;
+  --line:#e2e6ea; --accent:#1f4e79; --accent-soft:#eaf1f8; --chip:#eef1f4;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#14171a; --panel:#1b1f24; --ink:#e6e9ec; --muted:#9aa5b1;
+    --line:#2a3038; --accent:#7fb3e0; --accent-soft:#1d2a36; --chip:#232931;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+.page{max-width:880px; margin:0 auto; padding:48px 24px 72px}
+
+/* ---- header ---- */
+header{border-bottom:3px solid var(--accent); padding-bottom:22px; margin-bottom:34px}
+h1{
+  margin:0 0 6px; font-size:34px; line-height:1.15; letter-spacing:.02em;
+  font-weight:700; text-transform:uppercase;
+}
+.role{margin:0 0 16px; font-size:18px; color:var(--accent); font-weight:600}
+.contact{margin:0 0 4px; font-size:15px; color:var(--muted); word-break:break-word}
+.contact a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
+.contact a:hover{border-bottom-color:currentColor}
+.sep{opacity:.5; padding:0 6px}
+.location{margin:0; font-size:15px; color:var(--muted)}
+.actions{margin-top:20px}
+.btn{
+  display:inline-block; padding:10px 18px; border-radius:6px;
+  background:var(--accent); color:#fff; text-decoration:none;
+  font-size:15px; font-weight:600; border:1px solid var(--accent);
+}
+.btn:hover{filter:brightness(1.1)}
+@media (prefers-color-scheme:dark){ .btn{color:#14171a} }
+.actions{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+.btn-ghost{
+  background:transparent; color:var(--accent);
+  display:inline-flex; align-items:center; gap:8px;
+}
+.btn-ghost:hover{background:var(--accent-soft); filter:none}
+@media (prefers-color-scheme:dark){ .btn-ghost{color:var(--accent)} }
+.btn-ghost svg{width:17px; height:17px; fill:currentColor; flex:none}
+
+/* ---- sections ---- */
+section{margin-bottom:36px}
+h2{
+  margin:0 0 16px; font-size:13px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
+  padding-bottom:7px; border-bottom:1px solid var(--line);
+}
+p{margin:0 0 12px}
+section p:last-child{margin-bottom:0}
+
+/* ---- skills ---- */
+.skill-row{display:flex; gap:16px; margin-bottom:14px; flex-wrap:wrap}
+.skill-label{
+  flex:0 0 190px; font-weight:700; font-size:14px;
+  padding-top:4px; color:var(--ink);
+}
+.chips{display:flex; flex-wrap:wrap; gap:6px; flex:1 1 320px}
+.chip{
+  background:var(--chip); border:1px solid var(--line); border-radius:4px;
+  padding:3px 9px; font-size:13.5px; white-space:nowrap;
+}
+@media (max-width:620px){ .skill-label{flex-basis:100%; padding-top:0} }
+
+/* ---- experience ---- */
+.job{margin-bottom:14px}
+/* a later employer heading follows the previous employer's last project */
+.project + .job{margin-top:32px; padding-top:22px; border-top:1px solid var(--line)}
+.head{
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:12px; flex-wrap:wrap;
+}
+.job .title{font-size:20px; font-weight:700; margin:0}
+.dates{font-size:14px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums}
+.stack{margin:4px 0 0; font-size:14.5px; color:var(--muted)}
+
+.project{
+  border-left:3px solid var(--line); padding:0 0 2px 18px;
+  margin:24px 0 0; break-inside:avoid;
+}
+.project .title{font-size:16.5px; font-weight:700; margin:0; color:var(--accent)}
+.intro{margin:8px 0 10px; font-size:15px}
+.project ul{margin:0; padding-left:20px}
+.project li{margin-bottom:6px; font-size:15px}
+.env{
+  margin:12px 0 0; padding:8px 12px; background:var(--accent-soft);
+  border-radius:4px; font-size:13.5px; color:var(--muted);
+}
+.env b{color:var(--ink)}
+
+/* ---- lists ---- */
+ul.plain{margin:0; padding-left:20px}
+ul.plain li{margin-bottom:6px}
+.note{margin-top:12px; font-size:14.5px; color:var(--muted)}
+
+/* ---- print ---- */
+@media print{
+  :root{
+    --bg:#fff; --panel:#fff; --ink:#000; --muted:#444;
+    --line:#bbb; --accent:#1f4e79; --accent-soft:#f0f4f8; --chip:#f2f2f2;
+  }
+  body{font-size:10.5pt}
+  .page{max-width:none; padding:0}
+  .actions{display:none}
+  h1{font-size:22pt}
+  .role{font-size:12pt}
+  section{margin-bottom:16px; break-inside:auto}
+  .project,.skill-row,.job{break-inside:avoid}
+  h2{break-after:avoid}
+  a{color:inherit; text-decoration:none}
+}
+</style>
+<style>
+/* ---- case-study additions ---- */
+.back{margin:0 0 18px; font-size:14.5px}
+.back a{color:var(--muted); text-decoration:none; border-bottom:1px solid transparent}
+.back a:hover{border-bottom-color:currentColor}
+.metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:0 0 14px}
+.metric{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 16px}
+.metric .num{display:block; font-size:26px; font-weight:700; color:var(--accent); line-height:1.2; font-variant-numeric:tabular-nums}
+.metric .lbl{display:block; font-size:13.5px; color:var(--muted); margin-top:2px}
+.tbl-wrap{overflow-x:auto; margin:0 0 12px}
+table{border-collapse:collapse; width:100%; font-size:14.5px}
+th,td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+th{font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700}
+code{background:var(--chip); border:1px solid var(--line); border-radius:3px; padding:1px 5px; font-size:13.5px}
+pre{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 16px; overflow-x:auto; margin:0 0 12px; font-size:13.5px; line-height:1.55}
+pre code{background:none; border:0; padding:0; font-size:inherit}
+section ul.plain li{font-size:15px}
+@media print{ .back{display:none} pre,table{break-inside:avoid} }
+</style>
+</head>
+<body>
+<div class="page">
+
+<p class="back"><a href="./">&larr; Viachaslau Strelnikau &mdash; CV</a></p>
+
+<header>
+  <h1>Struts 2 &rarr; Spring</h1>
+  <p class="role">Migrating 600+ routes of a live enterprise application, without a rewrite</p>
+  <p class="contact">A case study in incremental legacy modernisation &mdash; method, guardrails, and what shipped.</p>
+  <p class="actions">
+    <a class="btn btn-ghost" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener">The skills this produced</a>
+  </p>
+</header>
+
+<section id="context">
+  <h2>The problem</h2>
+  <p>A large, long-lived enterprise Java web application in logistics and cross-border cargo handling. Hundreds of Struts 2 <code>.do</code> actions, a Hibernate 3 data layer, an Ext JS front end, JSP views, and a Spring Security configuration grown over years. Real users on it every working day.</p>
+  <p>The framework was long past support and blocking every dependency upgrade behind it. The obvious answer &mdash; rewrite it &mdash; was not available: there was no second team to run the old system while a new one was built, no downtime budget, and no complete specification of what the application actually did. The behaviour <em>was</em> the specification, and it only existed in the code.</p>
+  <p>So the constraint was set the other way round: the application stays live and keeps behaving identically, while the framework underneath it is replaced one route at a time.</p>
+</section>
+
+<section id="constraint">
+  <h2>What &ldquo;identical&rdquo; had to mean</h2>
+  <p>&ldquo;Preserve behaviour&rdquo; is uselessly vague until you write down what is observable. For this migration the contract was explicit, and every one of these had to survive a route move:</p>
+  <ul class="plain">
+    <li>URL and HTTP method, including wildcard action patterns</li>
+    <li>Request parameter names and formats, down to legacy date parsers that accept six different layouts</li>
+    <li>Response body shape &mdash; including a legacy pseudo-JSON envelope served as <code>text/html</code>, quirks intact</li>
+    <li>Status codes on failure, and the exact escaped error payload clients parse</li>
+    <li>Validation messages, redirects, cookies, and locale handling</li>
+    <li>Session semantics and per-operation authorities</li>
+    <li>Side effects: what gets persisted, archived, counted, or generated</li>
+  </ul>
+  <p class="note">Modernising Spring itself, the Java language level, and the container is separate, later work. Folding it into the migration would make every regression ambiguous &mdash; was it the route move, or the upgrade?</p>
+</section>
+
+<section id="slice">
+  <h2>The unit of work: a functional slice</h2>
+  <p>The migration never moves &ldquo;a controller&rdquo;. It moves a <strong>route together with everything that calls it</strong>: the JSP, every Ext JS caller, any external consumer, and the tests. A route migrated without its callers is a route with two implementations and no owner.</p>
+  <p>Each slice runs in a fixed order:</p>
+  <ul class="plain">
+    <li><strong>Characterize first.</strong> Exercise the live legacy route and write down its actual contract &mdash; not what the code appears to do. Characterization tests are written <em>before</em> any change, so they describe the old behaviour rather than ratify the new.</li>
+    <li><strong>Replace the action with a thin Spring controller</strong> delegating to services, with explicit request, response, and view models.</li>
+    <li><strong>Move the clients in the same change.</strong> Struts tags, ValueStack access, and action names come out of the JSP and the JavaScript.</li>
+    <li><strong>Verify, then retire.</strong> Struts mappings, filters, and JARs are removed only after both routes pass and traffic confirms the legacy path is dead.</li>
+  </ul>
+  <p>Slices are size-capped on purpose. A slice small enough to hold in your head is a slice you can prove.</p>
+</section>
+
+<section id="compat">
+  <h2>Compatibility forwards, not redirects</h2>
+  <p>Old URLs cannot simply disappear &mdash; bookmarks, cached JavaScript, integrations, and clients nobody has an inventory of still call them. The usual reflex is an HTTP redirect. That is the wrong tool: a redirect can change the method, drop the body, re-run authentication, and alter the status code the caller sees. Any of those is a behaviour change wearing a compatibility costume.</p>
+  <p>Instead, a registry maps each legacy path &mdash; and, where an action multiplexed on a selector parameter, each individual operation &mdash; to an <strong>internal server-side forward</strong> reaching the same Spring-native implementation the canonical route uses. One implementation, two doors. The caller cannot tell which door it came through.</p>
+  <p>An alias stays active while any registered client is still pending, and retires on evidence &mdash; an observation window with no traffic &mdash; rather than on a date in a plan.</p>
+  <p class="note">A migrated route must be Spring-native end to end. A Spring controller that reaches back into a Struts action bean has not migrated anything; it has added a layer. That rule is enforced by contract tests, not by good intentions.</p>
+</section>
+
+<section id="catalog">
+  <h2>Making progress auditable</h2>
+  <p>At this scale the hard problem is not moving a route. It is knowing, six weeks later, which routes really moved, which are half-moved, and what evidence exists for either. Memory and commit messages do not survive that.</p>
+  <p>Every route has a record: legacy pattern, canonical path, compatibility mode, request contract, response contract, security, side effects, the exact client files updated, the tests that cover it, and &mdash; the field that matters most &mdash; what remains unverified.</p>
+  <pre><code>routes:
+  - id: customer-search
+    legacy:    { method: POST, path: /customer/search.do }
+    canonical: { method: POST, path: /rest/customers/search }
+    compatibility:
+      mode: server-side-alias
+      legacy_route_active: true
+    contract:
+      breaking: false
+      request_changes: none
+      response_changes: none
+      authentication: existing-session
+    backend_status: migrated
+    clients:
+      - { name: customer-jsp,     status: migrated }
+      - { name: reporting-client, status: pending  }</code></pre>
+  <p>Status is a <strong>closed vocabulary</strong>, not free text, so progress cannot be inflated by adjective:</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>inventory-pending</code></td><td>Known, not yet characterized</td></tr>
+      <tr><td><code>partially-implemented</code></td><td>Some operations migrated, others pending</td></tr>
+      <tr><td><code>implemented</code></td><td>Spring owns the route; ownership verified in source</td></tr>
+      <tr><td><code>implemented-verified</code></td><td>&hellip; and focused tests cover it</td></tr>
+      <tr><td><code>implemented-live-verified</code></td><td>&hellip; and it has been verified in a running instance</td></tr>
+      <tr><td><code>retired</code></td><td>The legacy compatibility alias has been removed</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>A route may not sit at a terminal status while evidence is outstanding. Anything unproven stays visible in a non-terminal status or an explicit <code>remaining</code> field. The catalog is allowed to say the work is unfinished &mdash; that is what makes it worth reading.</p>
+</section>
+
+<section id="gate">
+  <h2>Verification as a separate role</h2>
+  <p>Whoever implements a slice is the worst available judge of whether it works. So acceptance is a distinct step with its own rules, run against the <em>running</em> application rather than the diff: focused review against project rules, the smallest useful build and test set, HTTP verification of every operation, browser end-to-end checks where UI integration matters, and persistence checks for anything that mutates state.</p>
+  <p>It returns exactly one of three outcomes, and it is forbidden from touching source code to improve its own result:</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Outcome</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>PASS</code></td><td>The migrated functionality demonstrably works from the API, client, or user perspective.</td></tr>
+      <tr><td><code>FAIL</code></td><td>It does not. Blocking; goes back to implementation.</td></tr>
+      <tr><td><code>INCOMPLETE</code></td><td>It could not be verified &mdash; missing runtime access, an external system, credentials. Aliases stay, the slice stays runtime-pending.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><code>INCOMPLETE</code> is the load-bearing one. Without it every unverifiable check quietly becomes a pass, and the catalog turns into fiction. &ldquo;We could not check this&rdquo; is not &ldquo;this is fine&rdquo;.</p>
+</section>
+
+<section id="status">
+  <h2>Where it stands</h2>
+  <div class="metrics">
+    <div class="metric"><span class="num">621</span><span class="lbl">routes catalogued</span></div>
+    <div class="metric"><span class="num">607</span><span class="lbl">Spring-owned</span></div>
+    <div class="metric"><span class="num">349</span><span class="lbl">test- or runtime-verified</span></div>
+    <div class="metric"><span class="num">31</span><span class="lbl">legacy action classes left</span></div>
+    <div class="metric"><span class="num">~2,000</span><span class="lbl">test files</span></div>
+  </div>
+  <p>Fourteen routes remain outstanding &mdash; eight not yet characterized, six partially migrated. Most compatibility aliases are still active by design, awaiting their observation windows; six have retired.</p>
+  <p class="note">The application predates its current version-control history &mdash; it lived in Subversion for years before this work began &mdash; so commit counts here measure the migration, not the codebase.</p>
+</section>
+
+<section id="skills">
+  <h2>Why this became a public repository</h2>
+  <p>A method applied six hundred times has to live somewhere other than one person&rsquo;s head. Held informally it drifts: a slice gets migrated without its callers, a status gets rounded up, a verification step gets skipped because the previous route did not need it.</p>
+  <p>So the method was written down as <strong>agent skills</strong> &mdash; structured instruction documents an AI coding agent loads when a task matches, carrying the workflow, the task modes, and the guardrails with it. The migration workflow, the quality gate, the Hibernate Criteria conversion, test design for Java and Angular, and production logging are six of them.</p>
+  <p>The application is client-owned and private. The method is not, and it generalises: the same slice-and-catalog discipline applies to any framework migration where the old system has to stay up.</p>
+  <p class="actions">
+    <a class="btn" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener">View agent-skills on GitHub</a>
+    <a class="btn btn-ghost" href="./">Back to CV</a>
+  </p>
+</section>
+
+</div>
+</body>
+</html>
