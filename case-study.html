@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Case study &mdash; Migrating 600+ routes from Struts 2 to Spring</title>
-<meta name="description" content="How a large legacy Java web application was moved from Struts 2 to Spring MVC one route at a time, with no rewrite and no downtime.">
+<title>Case study &mdash; Removing Struts 2 from a live application</title>
+<meta name="description" content="How Struts 2 was removed from a large legacy Java web application: 667 routes moved to Spring MVC one slice at a time, with no rewrite and no downtime. Completed 2026-08-29.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%92%BB%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -130,19 +130,34 @@ ul.plain li{margin-bottom:6px}
 .back{margin:0 0 18px; font-size:14.5px}
 .back a{color:var(--muted); text-decoration:none; border-bottom:1px solid transparent}
 .back a:hover{border-bottom-color:currentColor}
+.done{margin:0; font-size:15px; color:var(--muted)}
+.done strong{color:var(--ink)}
 .metrics{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:0 0 14px}
 .metric{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 16px}
 .metric .num{display:block; font-size:26px; font-weight:700; color:var(--accent); line-height:1.2; font-variant-numeric:tabular-nums}
 .metric .lbl{display:block; font-size:13.5px; color:var(--muted); margin-top:2px}
+
+/* ---- was -> became deltas ---- */
+.deltas{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px; margin:0 0 18px}
+.delta{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 12px; text-align:center}
+.delta .pair{display:flex; align-items:baseline; justify-content:center; gap:7px; line-height:1.15}
+.delta .from{font-size:20px; font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums}
+.delta .arrow{font-size:15px; color:var(--muted); opacity:.65}
+.delta .to{font-size:28px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums}
+.delta .lbl{display:block; font-size:13.5px; color:var(--muted); margin-top:5px; line-height:1.35}
+.delta .lbl code{font-size:12.5px}
+
 .tbl-wrap{overflow-x:auto; margin:0 0 12px}
 table{border-collapse:collapse; width:100%; font-size:14.5px}
 th,td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); vertical-align:top}
 th{font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700}
+.cmp td:first-child{font-weight:600}
+.cmp td:nth-child(2){color:var(--muted)}
 code{background:var(--chip); border:1px solid var(--line); border-radius:3px; padding:1px 5px; font-size:13.5px}
 pre{background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:14px 16px; overflow-x:auto; margin:0 0 12px; font-size:13.5px; line-height:1.55}
 pre code{background:none; border:0; padding:0; font-size:inherit}
 section ul.plain li{font-size:15px}
-@media print{ .back{display:none} pre,table{break-inside:avoid} }
+@media print{ .back{display:none} pre,table,.delta,.metric{break-inside:avoid} }
 </style>
 </head>
 <body>
@@ -152,8 +167,9 @@ section ul.plain li{font-size:15px}
 
 <header>
   <h1>Struts 2 &rarr; Spring</h1>
-  <p class="role">Migrating 600+ routes of a live enterprise application, without a rewrite</p>
+  <p class="role">Removing a framework from a live enterprise application, one route at a time</p>
   <p class="contact">A case study in incremental legacy modernisation &mdash; method, guardrails, and what shipped.</p>
+  <p class="done"><strong>Completed 2026-08-29.</strong> 667 routes, 68 days, 1,078 numbered migration commits, no rewrite.</p>
   <p class="actions">
     <a class="btn btn-ghost" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener">The skills this produced</a>
   </p>
@@ -178,28 +194,29 @@ section ul.plain li{font-size:15px}
     <li>Session semantics and per-operation authorities</li>
     <li>Side effects: what gets persisted, archived, counted, or generated</li>
   </ul>
-  <p class="note">Modernising Spring itself, the Java language level, and the container is separate, later work. Folding it into the migration would make every regression ambiguous &mdash; was it the route move, or the upgrade?</p>
+  <p class="note">Modernising Spring itself, the Java language level, and the container was separate, later work. Folding it in would have made every regression ambiguous &mdash; was it the route move, or the upgrade? The target was the Spring MVC 3.2 baseline already present in the application, not the Spring of the day.</p>
 </section>
 
 <section id="slice">
   <h2>The unit of work: a functional slice</h2>
-  <p>The migration never moves &ldquo;a controller&rdquo;. It moves a <strong>route together with everything that calls it</strong>: the JSP, every Ext JS caller, any external consumer, and the tests. A route migrated without its callers is a route with two implementations and no owner.</p>
-  <p>Each slice runs in a fixed order:</p>
+  <p>The migration never moved &ldquo;a controller&rdquo;. It moved a <strong>route together with everything that calls it</strong>: the JSP, every Ext JS caller, any external consumer, and the tests. A route migrated without its callers is a route with two implementations and no owner.</p>
+  <p>Each slice ran in a fixed order:</p>
   <ul class="plain">
     <li><strong>Characterize first.</strong> Exercise the live legacy route and write down its actual contract &mdash; not what the code appears to do. Characterization tests are written <em>before</em> any change, so they describe the old behaviour rather than ratify the new.</li>
     <li><strong>Replace the action with a thin Spring controller</strong> delegating to services, with explicit request, response, and view models.</li>
     <li><strong>Move the clients in the same change.</strong> Struts tags, ValueStack access, and action names come out of the JSP and the JavaScript.</li>
     <li><strong>Verify, then retire.</strong> Struts mappings, filters, and JARs are removed only after both routes pass and traffic confirms the legacy path is dead.</li>
   </ul>
-  <p>Slices are size-capped on purpose. A slice small enough to hold in your head is a slice you can prove.</p>
+  <p>Slices were size-capped on purpose: at most eight read-only JSON endpoints, or five for anything that changes state, uploads, downloads, renders a JSP, or touches security. A slice small enough to hold in your head is a slice you can prove.</p>
 </section>
 
 <section id="compat">
   <h2>Compatibility forwards, not redirects</h2>
   <p>Old URLs cannot simply disappear &mdash; bookmarks, cached JavaScript, integrations, and clients nobody has an inventory of still call them. The usual reflex is an HTTP redirect. That is the wrong tool: a redirect can change the method, drop the body, re-run authentication, and alter the status code the caller sees. Any of those is a behaviour change wearing a compatibility costume.</p>
-  <p>Instead, a registry maps each legacy path &mdash; and, where an action multiplexed on a selector parameter, each individual operation &mdash; to an <strong>internal server-side forward</strong> reaching the same Spring-native implementation the canonical route uses. One implementation, two doors. The caller cannot tell which door it came through.</p>
-  <p>An alias stays active while any registered client is still pending, and retires on evidence &mdash; an observation window with no traffic &mdash; rather than on a date in a plan.</p>
-  <p class="note">A migrated route must be Spring-native end to end. A Spring controller that reaches back into a Struts action bean has not migrated anything; it has added a layer. That rule is enforced by contract tests, not by good intentions.</p>
+  <p>Instead, a registry mapped each legacy path &mdash; and, where an action multiplexed on a selector parameter, each individual operation &mdash; to an <strong>internal server-side forward</strong> reaching the same Spring-native implementation the canonical route used. One implementation, two doors. The caller could not tell which door it came through.</p>
+  <p>An alias stayed active while any registered client was still pending, and retired on evidence &mdash; an observation window with no traffic &mdash; rather than on a date in a plan.</p>
+  <p>The whole layer was scaffolding by design. It grew to <strong>815 active aliases</strong> at its peak and came down to zero at cutover; the registry file no longer exists in the repository.</p>
+  <p class="note">A migrated route had to be Spring-native end to end. A Spring controller that reaches back into a Struts action bean has not migrated anything; it has added a layer. That rule was enforced by contract tests, not by good intentions.</p>
 </section>
 
 <section id="catalog">
@@ -237,11 +254,12 @@ section ul.plain li{font-size:15px}
   </table>
   </div>
   <p>A route may not sit at a terminal status while evidence is outstanding. Anything unproven stays visible in a non-terminal status or an explicit <code>remaining</code> field. The catalog is allowed to say the work is unfinished &mdash; that is what makes it worth reading.</p>
+  <p class="note">This was not free. A mid-project audit found the vocabulary had quietly collapsed: roughly 180 distinct <code>status:</code> values had crept into the records. The fix was to enforce the six permitted values in a validator script rather than in a document &mdash; the only place a rule survives contact with six hundred files.</p>
 </section>
 
 <section id="gate">
   <h2>Verification as a separate role</h2>
-  <p>Whoever implements a slice is the worst available judge of whether it works. So acceptance is a distinct step with its own rules, run against the <em>running</em> application rather than the diff: focused review against project rules, the smallest useful build and test set, HTTP verification of every operation, browser end-to-end checks where UI integration matters, and persistence checks for anything that mutates state.</p>
+  <p>Whoever implements a slice is the worst available judge of whether it works. So acceptance was a distinct step with its own rules, run against the <em>running</em> application rather than the diff: focused review against project rules, the smallest useful build and test set, HTTP verification of every operation, browser end-to-end checks where UI integration mattered, and persistence checks for anything that mutates state.</p>
   <p>It returns exactly one of three outcomes, and it is forbidden from touching source code to improve its own result:</p>
   <div class="tbl-wrap">
   <table>
@@ -256,23 +274,72 @@ section ul.plain li{font-size:15px}
   <p><code>INCOMPLETE</code> is the load-bearing one. Without it every unverifiable check quietly becomes a pass, and the catalog turns into fiction. &ldquo;We could not check this&rdquo; is not &ldquo;this is fine&rdquo;.</p>
 </section>
 
-<section id="status">
-  <h2>Where it stands</h2>
-  <div class="metrics">
-    <div class="metric"><span class="num" data-metric="catalogued">667</span><span class="lbl">routes catalogued</span></div>
-    <div class="metric"><span class="num" data-metric="springOwned">667</span><span class="lbl">Spring-owned</span></div>
-    <div class="metric"><span class="num" data-metric="verified">0</span><span class="lbl">test- or runtime-verified</span></div>
-    <div class="metric"><span class="num" data-metric="actionClassesLeft">0</span><span class="lbl">legacy action classes left</span></div>
-    <div class="metric"><span class="num" data-metric="testFiles">1,710</span><span class="lbl">test files</span></div>
+<section id="became">
+  <h2>Was &rarr; became</h2>
+  <p>The &ldquo;was&rdquo; column is the project&rsquo;s own baseline, captured on 2026-07-15 before the first slice moved. The &ldquo;became&rdquo; column is the state at the <code>B3.986</code> cutover on 2026-08-29.</p>
+
+  <div class="deltas">
+    <div class="delta"><span class="pair"><span class="from">158</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">Struts action classes</span></div>
+    <div class="delta"><span class="pair"><span class="from">815</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">compatibility aliases</span></div>
+    <div class="delta"><span class="pair"><span class="from">163</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">authored <code>.do</code> callers</span></div>
+    <div class="delta"><span class="pair"><span class="from">174</span><span class="arrow">&rarr;</span><span class="to">667</span></span><span class="lbl">routes catalogued</span></div>
   </div>
-  <p><span data-metric="outstanding">0</span> routes remain outstanding &mdash; <span data-metric="inventoryPending">0</span> not yet characterized, <span data-metric="partiallyImplemented">0</span> partially migrated. Most compatibility aliases are still active by design, awaiting their observation windows; <span data-metric="retired">667</span> have retired.</p>
-  <p class="note" id="asof">Figures generated from the route catalog on <span data-metric="generated">2026-09-01</span>.</p>
-  <p class="note">The application predates its current version-control history &mdash; it lived in Subversion for years before this work began &mdash; so commit counts here measure the migration, not the codebase.</p>
+
+  <div class="tbl-wrap">
+  <table class="cmp">
+    <thead><tr><th>Dimension</th><th>Was &mdash; 2026-07-15</th><th>Became &mdash; 2026-08-29</th></tr></thead>
+    <tbody>
+      <tr><td>Request dispatch</td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; <strong>Struts filter on <code>/*</code></strong> &rarr; Spring MVC on <code>/rest/*</code></td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; Spring MVC on <code>/rest/*</code></td></tr>
+      <tr><td>Struts action mappings</td><td>180 across 45 packages, 50 of them wildcard</td><td>0</td></tr>
+      <tr><td>Struts configuration files</td><td>3</td><td>0</td></tr>
+      <tr><td>Java action classes</td><td>158</td><td>0 &mdash; the package is deleted</td></tr>
+      <tr><td>Spring controllers</td><td>1</td><td>466, carrying 468 <code>@Controller</code> and 632 <code>@RequestMapping</code> declarations</td></tr>
+      <tr><td>Authored <code>.do</code> calls in Ext JS and JSP</td><td>163</td><td>0</td></tr>
+      <tr><td>JSPs using Struts tags</td><td>19</td><td>0</td></tr>
+      <tr><td>Struts, XWork, OGNL, FreeMarker and Velocity JARs</td><td>13 &mdash; including four concurrent <code>struts2-core</code> versions</td><td>0, and 0 of the 25,575 entries in the packaged WAR</td></tr>
+      <tr><td>Compatibility aliases</td><td>&mdash; the mechanism did not exist yet</td><td>815 at peak, then 0</td></tr>
+      <tr><td>Java test classes</td><td>0</td><td>1,710, green on Java 8 in CI</td></tr>
+      <tr><td>Build</td><td>Ant and Eclipse over a 242-JAR vendored <code>lib/</code></td><td>Maven</td></tr>
+      <tr><td>Route catalog</td><td>174 routes in the first generated inventory</td><td>667 records, every one terminal</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">The compatibility layer has no &ldquo;was&rdquo; value because it did not exist before the migration. It was built during it, peaked at 815 active aliases, and was dismantled completely at cutover &mdash; scaffolding, not architecture. The catalog grew from 174 to 667 for the same reason the work was tractable at all: a single wildcard action turned out to be many distinct operations, and each one needed its own contract before it could be moved.</p>
+</section>
+
+<section id="ended">
+  <h2>How it ended</h2>
+  <div class="metrics">
+    <div class="metric"><span class="num">667</span><span class="lbl">routes, all Spring-owned</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl">legacy action classes</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl">active compatibility aliases</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl">Struts classes in the WAR</span></div>
+  </div>
+  <p>All 667 routes cleared the final retirement gate: no pending compatibility evidence, no active aliases, a packaged WAR with no Struts or XWork classes, and a green regression run at cutover. The gate is a script rather than a judgement, so it prints its counters next to its verdict and returns an exit code either way:</p>
+  <pre><code>STRUTS_FILTER_PRESENT=false          WAR_ENTRIES=25575
+ACTIVE_STRUTS_ACTION_MAPPINGS=0      WAR_STRUTS_XWORK_JARS=0
+ACTIVE_COMPATIBILITY_ALIASES=0       WAR_STRUTS_XWORK_CLASSES=0
+AUTHORED_LEGACY_CALL_LINES=0         WAR_ACTION_CLASSES=0
+PENDING_ROUTE_EVIDENCE=0             WAR_STRUTS_FILTER_PRESENT=false
+
+STRUTS_LIVE_FINAL_GATE=PASS
+STRUTS_SURFACE_RETIREMENT_GATE=PASS
+GATE_EXIT=0</code></pre>
+  <p>Regression at cutover: <code>OK (1733 tests)</code>. The full Java 8 suite now runs in CI as a delivery gate rather than as a migration artefact. Retired <code>.do</code> paths return 404 to anonymous and authenticated callers alike, and the canonical <code>/rest/system/ping</code> returns a body byte-identical to the 56 bytes the old <code>/Ping.do</code> returned &mdash; a last, small check of the contract this whole exercise existed to preserve.</p>
+  <p>The most instructive moment was a refusal. The analyser that had to confirm no client was still calling the legacy paths returned <code>VERDICT=INCOMPLETE_SOURCE</code> instead of <code>PASS</code>. It had seen zero compatibility events and zero legacy requests &mdash; but only from an idle local instance, and its own rule is that a local-idle window is not evidence about production.</p>
+  <p>The way past it was not to relax the rule. It was an explicit human attestation about who the remaining consumers actually were, encoded so the gate could check it rather than take it on trust:</p>
+  <pre><code>RETIREMENT_EVIDENCE_SOURCE=external-consumer
+RETIREMENT_EVIDENCE_WINDOW_HOURS=24.00
+RETIREMENT_EVIDENCE_COMPATIBILITY_EVENTS=0
+RETIREMENT_EVIDENCE_LEGACY_DO_REQUESTS=0
+RETIREMENT_EVIDENCE_VERDICT=PASS_ZERO_LEGACY_TRAFFIC</code></pre>
+  <p>A gate that can only pass is a decoration. This one could block the thing everybody wanted, and did.</p>
+  <p class="note">Figures are the recorded <code>B3.986</code> cutover evidence, frozen on completion. The application predates its current version-control history &mdash; it lived in Subversion for years before this work began &mdash; so commit counts here measure the migration, not the codebase.</p>
 </section>
 
 <section id="skills">
   <h2>Why this became a public repository</h2>
-  <p>A method applied six hundred times has to live somewhere other than one person&rsquo;s head. Held informally it drifts: a slice gets migrated without its callers, a status gets rounded up, a verification step gets skipped because the previous route did not need it.</p>
+  <p>A method applied six hundred times has to live somewhere other than one person&rsquo;s head. Held informally it drifts: a slice gets migrated without its callers, a status gets rounded up, a verification step gets skipped because the previous route did not need it. All three happened, and the audit that caught them is why the rules ended up in scripts.</p>
   <p>So the method was written down as <strong>agent skills</strong> &mdash; structured instruction documents an AI coding agent loads when a task matches, carrying the workflow, the task modes, and the guardrails with it. The migration workflow, the quality gate, the Hibernate Criteria conversion, test design for Java and Angular, and production logging are six of them.</p>
   <p>The application is client-owned and private. The method is not, and it generalises: the same slice-and-catalog discipline applies to any framework migration where the old system has to stay up.</p>
   <p class="actions">
@@ -283,32 +350,14 @@ section ul.plain li{font-size:15px}
 
 </div>
 
-<script>
-// Progress figures are exported from the (private) migration catalog as an integers-only
-// document and published here by CI. If it is missing or malformed the numbers baked into the
-// markup above stand, so the page is never blank and never half-updated.
-(function () {
-  var INTS = ['catalogued','springOwned','verified','outstanding','inventoryPending',
-              'partiallyImplemented','retired','actionClassesLeft','testFiles'];
-  fetch('metrics.json', {cache: 'no-store'})
-    .then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (m) {
-      if (!m) return;
-      INTS.forEach(function (k) {
-        var v = m[k];
-        if (typeof v !== 'number' || !isFinite(v)) return;
-        document.querySelectorAll('[data-metric="' + k + '"]').forEach(function (el) {
-          el.textContent = v.toLocaleString('en-US');
-        });
-      });
-      if (/^\d{4}-\d{2}-\d{2}$/.test(m.generated)) {
-        document.querySelectorAll('[data-metric="generated"]').forEach(function (el) {
-          el.textContent = m.generated;
-        });
-      }
-    })
-    .catch(function () { /* keep the baked-in figures */ });
-})();
-</script>
+<!--
+  Final state, frozen on completion.
+
+  This page used to hydrate its figures from metrics.json at load time, republished by a CI job that
+  read the private route catalog, rewrote the data-metric spans here, and pushed both files back in
+  one commit. The migration finished at B3.986 on 2026-08-29, so that job has been retired along
+  with it and every figure above is baked into the markup. metrics.json is kept beside this file as
+  the pipeline's last export and as a machine-readable record; nothing reads it any more.
+-->
 </body>
 </html>
