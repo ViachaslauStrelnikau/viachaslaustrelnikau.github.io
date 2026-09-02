@@ -159,33 +159,59 @@ pre code{background:none; border:0; padding:0; font-size:inherit}
 section ul.plain li{font-size:15px}
 @media print{ .back{display:none} pre,table,.delta,.metric{break-inside:avoid} }
 </style>
+<style>
+/* ---- language switch ---- */
+.topbar{display:flex; justify-content:space-between; align-items:center; gap:14px; margin:0 0 18px; flex-wrap:wrap}
+.topbar .back{margin:0}
+.lang{
+  display:inline-flex; flex:none; background:var(--panel);
+  border:1px solid var(--line); border-radius:6px; overflow:hidden;
+}
+.lang button{
+  appearance:none; -webkit-appearance:none; border:0; background:transparent;
+  color:var(--muted); font:inherit; font-size:13px; font-weight:700;
+  letter-spacing:.08em; padding:6px 13px; min-width:46px; cursor:pointer;
+}
+.lang button + button{border-left:1px solid var(--line)}
+.lang button:hover{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--accent); color:#fff; cursor:default}
+.lang button:focus-visible{outline:2px solid var(--accent); outline-offset:-2px}
+@media (prefers-color-scheme:dark){ .lang button[aria-pressed="true"]{color:#14171a} }
+@media print{ .lang{display:none} }
+</style>
 </head>
 <body>
 <div class="page">
 
-<p class="back"><a href="./">&larr; Viachaslau Strelnikau &mdash; CV</a></p>
+<div class="topbar">
+  <p class="back"><a href="./" data-i18n="back">&larr; Viachaslau Strelnikau &mdash; CV</a></p>
+  <div class="lang" role="group" aria-label="Language">
+    <button type="button" data-lang="en" aria-pressed="true" lang="en">EN</button>
+    <button type="button" data-lang="ru" aria-pressed="false" lang="ru">RU</button>
+  </div>
+</div>
 
 <header>
   <h1>Struts 2 &rarr; Spring</h1>
-  <p class="role">Removing a framework from a live enterprise application, one route at a time</p>
-  <p class="contact">A case study in incremental legacy modernisation &mdash; method, guardrails, and what shipped.</p>
-  <p class="done"><strong>Completed 2026-08-29.</strong> 667 routes, 68 days, 1,078 numbered migration commits, no rewrite.</p>
+  <p class="role" data-i18n="role">Removing a framework from a live enterprise application, one route at a time</p>
+  <p class="contact" data-i18n="tagline">A case study in incremental legacy modernisation &mdash; method, guardrails, and what shipped.</p>
+  <p class="done" data-i18n="done"><strong>Completed 2026-08-29.</strong> 667 routes, 68 days, 1,078 numbered migration commits, no rewrite.</p>
   <p class="actions">
-    <a class="btn btn-ghost" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener">The skills this produced</a>
+    <a class="btn btn-ghost" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener" data-i18n="btn-skills">The skills this produced</a>
   </p>
 </header>
 
 <section id="context">
-  <h2>The problem</h2>
-  <p>A large, long-lived enterprise Java web application in logistics and cross-border cargo handling. Hundreds of Struts 2 <code>.do</code> actions, a Hibernate 3 data layer, an Ext JS front end, JSP views, and a Spring Security configuration grown over years. Real users on it every working day.</p>
-  <p>The framework was long past support and blocking every dependency upgrade behind it. The obvious answer &mdash; rewrite it &mdash; was not available: there was no second team to run the old system while a new one was built, no downtime budget, and no complete specification of what the application actually did. The behaviour <em>was</em> the specification, and it only existed in the code.</p>
-  <p>So the constraint was set the other way round: the application stays live and keeps behaving identically, while the framework underneath it is replaced one route at a time.</p>
+  <h2 data-i18n="ctx-h">The problem</h2>
+  <p data-i18n="ctx-p1">A large, long-lived enterprise Java web application in logistics and cross-border cargo handling. Hundreds of Struts 2 <code>.do</code> actions, a Hibernate 3 data layer, an Ext JS front end, JSP views, and a Spring Security configuration grown over years. Real users on it every working day.</p>
+  <p data-i18n="ctx-p2">The framework was long past support and blocking every dependency upgrade behind it. The obvious answer &mdash; rewrite it &mdash; was not available: there was no second team to run the old system while a new one was built, no downtime budget, and no complete specification of what the application actually did. The behaviour <em>was</em> the specification, and it only existed in the code.</p>
+  <p data-i18n="ctx-p3">So the constraint was set the other way round: the application stays live and keeps behaving identically, while the framework underneath it is replaced one route at a time.</p>
 </section>
 
 <section id="constraint">
-  <h2>What &ldquo;identical&rdquo; had to mean</h2>
-  <p>&ldquo;Preserve behaviour&rdquo; is uselessly vague until you write down what is observable. For this migration the contract was explicit, and every one of these had to survive a route move:</p>
-  <ul class="plain">
+  <h2 data-i18n="con-h">What &ldquo;identical&rdquo; had to mean</h2>
+  <p data-i18n="con-p1">&ldquo;Preserve behaviour&rdquo; is uselessly vague until you write down what is observable. For this migration the contract was explicit, and every one of these had to survive a route move:</p>
+  <ul class="plain" data-i18n="con-list">
     <li>URL and HTTP method, including wildcard action patterns</li>
     <li>Request parameter names and formats, down to legacy date parsers that accept six different layouts</li>
     <li>Response body shape &mdash; including a legacy pseudo-JSON envelope served as <code>text/html</code>, quirks intact</li>
@@ -194,35 +220,35 @@ section ul.plain li{font-size:15px}
     <li>Session semantics and per-operation authorities</li>
     <li>Side effects: what gets persisted, archived, counted, or generated</li>
   </ul>
-  <p class="note">Modernising Spring itself, the Java language level, and the container was separate, later work. Folding it in would have made every regression ambiguous &mdash; was it the route move, or the upgrade? The target was the Spring MVC 3.2 baseline already present in the application, not the Spring of the day.</p>
+  <p class="note" data-i18n="con-note">Modernising Spring itself, the Java language level, and the container was separate, later work. Folding it in would have made every regression ambiguous &mdash; was it the route move, or the upgrade? The target was the Spring MVC 3.2 baseline already present in the application, not the Spring of the day.</p>
 </section>
 
 <section id="slice">
-  <h2>The unit of work: a functional slice</h2>
-  <p>The migration never moved &ldquo;a controller&rdquo;. It moved a <strong>route together with everything that calls it</strong>: the JSP, every Ext JS caller, any external consumer, and the tests. A route migrated without its callers is a route with two implementations and no owner.</p>
-  <p>Each slice ran in a fixed order:</p>
-  <ul class="plain">
+  <h2 data-i18n="sl-h">The unit of work: a functional slice</h2>
+  <p data-i18n="sl-p1">The migration never moved &ldquo;a controller&rdquo;. It moved a <strong>route together with everything that calls it</strong>: the JSP, every Ext JS caller, any external consumer, and the tests. A route migrated without its callers is a route with two implementations and no owner.</p>
+  <p data-i18n="sl-p2">Each slice ran in a fixed order:</p>
+  <ul class="plain" data-i18n="sl-list">
     <li><strong>Characterize first.</strong> Exercise the live legacy route and write down its actual contract &mdash; not what the code appears to do. Characterization tests are written <em>before</em> any change, so they describe the old behaviour rather than ratify the new.</li>
     <li><strong>Replace the action with a thin Spring controller</strong> delegating to services, with explicit request, response, and view models.</li>
     <li><strong>Move the clients in the same change.</strong> Struts tags, ValueStack access, and action names come out of the JSP and the JavaScript.</li>
     <li><strong>Verify, then retire.</strong> Struts mappings, filters, and JARs are removed only after both routes pass and traffic confirms the legacy path is dead.</li>
   </ul>
-  <p>Slices were size-capped on purpose: at most eight read-only JSON endpoints, or five for anything that changes state, uploads, downloads, renders a JSP, or touches security. A slice small enough to hold in your head is a slice you can prove.</p>
+  <p data-i18n="sl-p3">Slices were size-capped on purpose: at most eight read-only JSON endpoints, or five for anything that changes state, uploads, downloads, renders a JSP, or touches security. A slice small enough to hold in your head is a slice you can prove.</p>
 </section>
 
 <section id="compat">
-  <h2>Compatibility forwards, not redirects</h2>
-  <p>Old URLs cannot simply disappear &mdash; bookmarks, cached JavaScript, integrations, and clients nobody has an inventory of still call them. The usual reflex is an HTTP redirect. That is the wrong tool: a redirect can change the method, drop the body, re-run authentication, and alter the status code the caller sees. Any of those is a behaviour change wearing a compatibility costume.</p>
-  <p>Instead, a registry mapped each legacy path &mdash; and, where an action multiplexed on a selector parameter, each individual operation &mdash; to an <strong>internal server-side forward</strong> reaching the same Spring-native implementation the canonical route used. One implementation, two doors. The caller could not tell which door it came through.</p>
-  <p>An alias stayed active while any registered client was still pending, and retired on evidence &mdash; an observation window with no traffic &mdash; rather than on a date in a plan.</p>
-  <p>The whole layer was scaffolding by design. It grew to <strong>815 active aliases</strong> at its peak and came down to zero at cutover; the registry file no longer exists in the repository.</p>
-  <p class="note">A migrated route had to be Spring-native end to end. A Spring controller that reaches back into a Struts action bean has not migrated anything; it has added a layer. That rule was enforced by contract tests, not by good intentions.</p>
+  <h2 data-i18n="cp-h">Compatibility forwards, not redirects</h2>
+  <p data-i18n="cp-p1">Old URLs cannot simply disappear &mdash; bookmarks, cached JavaScript, integrations, and clients nobody has an inventory of still call them. The usual reflex is an HTTP redirect. That is the wrong tool: a redirect can change the method, drop the body, re-run authentication, and alter the status code the caller sees. Any of those is a behaviour change wearing a compatibility costume.</p>
+  <p data-i18n="cp-p2">Instead, a registry mapped each legacy path &mdash; and, where an action multiplexed on a selector parameter, each individual operation &mdash; to an <strong>internal server-side forward</strong> reaching the same Spring-native implementation the canonical route used. One implementation, two doors. The caller could not tell which door it came through.</p>
+  <p data-i18n="cp-p3">An alias stayed active while any registered client was still pending, and retired on evidence &mdash; an observation window with no traffic &mdash; rather than on a date in a plan.</p>
+  <p data-i18n="cp-p4">The whole layer was scaffolding by design. It grew to <strong>815 active aliases</strong> at its peak and came down to zero at cutover; the registry file no longer exists in the repository.</p>
+  <p class="note" data-i18n="cp-note">A migrated route had to be Spring-native end to end. A Spring controller that reaches back into a Struts action bean has not migrated anything; it has added a layer. That rule was enforced by contract tests, not by good intentions.</p>
 </section>
 
 <section id="catalog">
-  <h2>Making progress auditable</h2>
-  <p>At this scale the hard problem is not moving a route. It is knowing, six weeks later, which routes really moved, which are half-moved, and what evidence exists for either. Memory and commit messages do not survive that.</p>
-  <p>Every route has a record: legacy pattern, canonical path, compatibility mode, request contract, response contract, security, side effects, the exact client files updated, the tests that cover it, and &mdash; the field that matters most &mdash; what remains unverified.</p>
+  <h2 data-i18n="cat-h">Making progress auditable</h2>
+  <p data-i18n="cat-p1">At this scale the hard problem is not moving a route. It is knowing, six weeks later, which routes really moved, which are half-moved, and what evidence exists for either. Memory and commit messages do not survive that.</p>
+  <p data-i18n="cat-p2">Every route has a record: legacy pattern, canonical path, compatibility mode, request contract, response contract, security, side effects, the exact client files updated, the tests that cover it, and &mdash; the field that matters most &mdash; what remains unverified.</p>
   <pre><code>routes:
   - id: customer-search
     legacy:    { method: POST, path: /customer/search.do }
@@ -239,9 +265,9 @@ section ul.plain li{font-size:15px}
     clients:
       - { name: customer-jsp,     status: migrated }
       - { name: reporting-client, status: pending  }</code></pre>
-  <p>Status is a <strong>closed vocabulary</strong>, not free text, so progress cannot be inflated by adjective:</p>
+  <p data-i18n="cat-p3">Status is a <strong>closed vocabulary</strong>, not free text, so progress cannot be inflated by adjective:</p>
   <div class="tbl-wrap">
-  <table>
+  <table data-i18n="cat-table">
     <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
     <tbody>
       <tr><td><code>inventory-pending</code></td><td>Known, not yet characterized</td></tr>
@@ -253,16 +279,16 @@ section ul.plain li{font-size:15px}
     </tbody>
   </table>
   </div>
-  <p>A route may not sit at a terminal status while evidence is outstanding. Anything unproven stays visible in a non-terminal status or an explicit <code>remaining</code> field. The catalog is allowed to say the work is unfinished &mdash; that is what makes it worth reading.</p>
-  <p class="note">This was not free. A mid-project audit found the vocabulary had quietly collapsed: roughly 180 distinct <code>status:</code> values had crept into the records. The fix was to enforce the six permitted values in a validator script rather than in a document &mdash; the only place a rule survives contact with six hundred files.</p>
+  <p data-i18n="cat-p4">A route may not sit at a terminal status while evidence is outstanding. Anything unproven stays visible in a non-terminal status or an explicit <code>remaining</code> field. The catalog is allowed to say the work is unfinished &mdash; that is what makes it worth reading.</p>
+  <p class="note" data-i18n="cat-note">This was not free. A mid-project audit found the vocabulary had quietly collapsed: roughly 180 distinct <code>status:</code> values had crept into the records. The fix was to enforce the six permitted values in a validator script rather than in a document &mdash; the only place a rule survives contact with six hundred files.</p>
 </section>
 
 <section id="gate">
-  <h2>Verification as a separate role</h2>
-  <p>Whoever implements a slice is the worst available judge of whether it works. So acceptance was a distinct step with its own rules, run against the <em>running</em> application rather than the diff: focused review against project rules, the smallest useful build and test set, HTTP verification of every operation, browser end-to-end checks where UI integration mattered, and persistence checks for anything that mutates state.</p>
-  <p>It returns exactly one of three outcomes, and it is forbidden from touching source code to improve its own result:</p>
+  <h2 data-i18n="g-h">Verification as a separate role</h2>
+  <p data-i18n="g-p1">Whoever implements a slice is the worst available judge of whether it works. So acceptance was a distinct step with its own rules, run against the <em>running</em> application rather than the diff: focused review against project rules, the smallest useful build and test set, HTTP verification of every operation, browser end-to-end checks where UI integration mattered, and persistence checks for anything that mutates state.</p>
+  <p data-i18n="g-p2">It returns exactly one of three outcomes, and it is forbidden from touching source code to improve its own result:</p>
   <div class="tbl-wrap">
-  <table>
+  <table data-i18n="g-table">
     <thead><tr><th>Outcome</th><th>Meaning</th></tr></thead>
     <tbody>
       <tr><td><code>PASS</code></td><td>The migrated functionality demonstrably works from the API, client, or user perspective.</td></tr>
@@ -271,22 +297,22 @@ section ul.plain li{font-size:15px}
     </tbody>
   </table>
   </div>
-  <p><code>INCOMPLETE</code> is the load-bearing one. Without it every unverifiable check quietly becomes a pass, and the catalog turns into fiction. &ldquo;We could not check this&rdquo; is not &ldquo;this is fine&rdquo;.</p>
+  <p data-i18n="g-p3"><code>INCOMPLETE</code> is the load-bearing one. Without it every unverifiable check quietly becomes a pass, and the catalog turns into fiction. &ldquo;We could not check this&rdquo; is not &ldquo;this is fine&rdquo;.</p>
 </section>
 
 <section id="became">
-  <h2>Was &rarr; became</h2>
-  <p>The &ldquo;was&rdquo; column is the project&rsquo;s own baseline, captured on 2026-07-15 before the first slice moved. The &ldquo;became&rdquo; column is the state at the <code>B3.986</code> cutover on 2026-08-29.</p>
+  <h2 data-i18n="bc-h">Was &rarr; became</h2>
+  <p data-i18n="bc-p1">The &ldquo;was&rdquo; column is the project&rsquo;s own baseline, captured on 2026-07-15 before the first slice moved. The &ldquo;became&rdquo; column is the state at the <code>B3.986</code> cutover on 2026-08-29.</p>
 
   <div class="deltas">
-    <div class="delta"><span class="pair"><span class="from">158</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">Struts action classes</span></div>
-    <div class="delta"><span class="pair"><span class="from">815</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">compatibility aliases</span></div>
-    <div class="delta"><span class="pair"><span class="from">163</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl">authored <code>.do</code> callers</span></div>
-    <div class="delta"><span class="pair"><span class="from">174</span><span class="arrow">&rarr;</span><span class="to">667</span></span><span class="lbl">routes catalogued</span></div>
+    <div class="delta"><span class="pair"><span class="from">158</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl" data-i18n="d1">Struts action classes</span></div>
+    <div class="delta"><span class="pair"><span class="from">815</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl" data-i18n="d2">compatibility aliases</span></div>
+    <div class="delta"><span class="pair"><span class="from">163</span><span class="arrow">&rarr;</span><span class="to">0</span></span><span class="lbl" data-i18n="d3">authored <code>.do</code> callers</span></div>
+    <div class="delta"><span class="pair"><span class="from">174</span><span class="arrow">&rarr;</span><span class="to">667</span></span><span class="lbl" data-i18n="d4">routes catalogued</span></div>
   </div>
 
   <div class="tbl-wrap">
-  <table class="cmp">
+  <table class="cmp" data-i18n="bc-table">
     <thead><tr><th>Dimension</th><th>Was &mdash; 2026-07-15</th><th>Became &mdash; 2026-08-29</th></tr></thead>
     <tbody>
       <tr><td>Request dispatch</td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; <strong>Struts filter on <code>/*</code></strong> &rarr; Spring MVC on <code>/rest/*</code></td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; Spring MVC on <code>/rest/*</code></td></tr>
@@ -304,18 +330,18 @@ section ul.plain li{font-size:15px}
     </tbody>
   </table>
   </div>
-  <p class="note">The compatibility layer has no &ldquo;was&rdquo; value because it did not exist before the migration. It was built during it, peaked at 815 active aliases, and was dismantled completely at cutover &mdash; scaffolding, not architecture. The catalog grew from 174 to 667 for the same reason the work was tractable at all: a single wildcard action turned out to be many distinct operations, and each one needed its own contract before it could be moved.</p>
+  <p class="note" data-i18n="bc-note">The compatibility layer has no &ldquo;was&rdquo; value because it did not exist before the migration. It was built during it, peaked at 815 active aliases, and was dismantled completely at cutover &mdash; scaffolding, not architecture. The catalog grew from 174 to 667 for the same reason the work was tractable at all: a single wildcard action turned out to be many distinct operations, and each one needed its own contract before it could be moved.</p>
 </section>
 
 <section id="ended">
-  <h2>How it ended</h2>
+  <h2 data-i18n="en-h">How it ended</h2>
   <div class="metrics">
-    <div class="metric"><span class="num">667</span><span class="lbl">routes, all Spring-owned</span></div>
-    <div class="metric"><span class="num">0</span><span class="lbl">legacy action classes</span></div>
-    <div class="metric"><span class="num">0</span><span class="lbl">active compatibility aliases</span></div>
-    <div class="metric"><span class="num">0</span><span class="lbl">Struts classes in the WAR</span></div>
+    <div class="metric"><span class="num">667</span><span class="lbl" data-i18n="m1">routes, all Spring-owned</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl" data-i18n="m2">legacy action classes</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl" data-i18n="m3">active compatibility aliases</span></div>
+    <div class="metric"><span class="num">0</span><span class="lbl" data-i18n="m4">Struts classes in the WAR</span></div>
   </div>
-  <p>All 667 routes cleared the final retirement gate: no pending compatibility evidence, no active aliases, a packaged WAR with no Struts or XWork classes, and a green regression run at cutover. The gate is a script rather than a judgement, so it prints its counters next to its verdict and returns an exit code either way:</p>
+  <p data-i18n="en-p1">All 667 routes cleared the final retirement gate: no pending compatibility evidence, no active aliases, a packaged WAR with no Struts or XWork classes, and a green regression run at cutover. The gate is a script rather than a judgement, so it prints its counters next to its verdict and returns an exit code either way:</p>
   <pre><code>STRUTS_FILTER_PRESENT=false          WAR_ENTRIES=25575
 ACTIVE_STRUTS_ACTION_MAPPINGS=0      WAR_STRUTS_XWORK_JARS=0
 ACTIVE_COMPATIBILITY_ALIASES=0       WAR_STRUTS_XWORK_CLASSES=0
@@ -325,30 +351,219 @@ PENDING_ROUTE_EVIDENCE=0             WAR_STRUTS_FILTER_PRESENT=false
 STRUTS_LIVE_FINAL_GATE=PASS
 STRUTS_SURFACE_RETIREMENT_GATE=PASS
 GATE_EXIT=0</code></pre>
-  <p>Regression at cutover: <code>OK (1733 tests)</code>. The full Java 8 suite now runs in CI as a delivery gate rather than as a migration artefact. Retired <code>.do</code> paths return 404 to anonymous and authenticated callers alike, and the canonical <code>/rest/system/ping</code> returns a body byte-identical to the 56 bytes the old <code>/Ping.do</code> returned &mdash; a last, small check of the contract this whole exercise existed to preserve.</p>
-  <p>The most instructive moment was a refusal. The analyser that had to confirm no client was still calling the legacy paths returned <code>VERDICT=INCOMPLETE_SOURCE</code> instead of <code>PASS</code>. It had seen zero compatibility events and zero legacy requests &mdash; but only from an idle local instance, and its own rule is that a local-idle window is not evidence about production.</p>
-  <p>The way past it was not to relax the rule. It was an explicit human attestation about who the remaining consumers actually were, encoded so the gate could check it rather than take it on trust:</p>
+  <p data-i18n="en-p2">Regression at cutover: <code>OK (1733 tests)</code>. The full Java 8 suite now runs in CI as a delivery gate rather than as a migration artefact. Retired <code>.do</code> paths return 404 to anonymous and authenticated callers alike, and the canonical <code>/rest/system/ping</code> returns a body byte-identical to the 56 bytes the old <code>/Ping.do</code> returned &mdash; a last, small check of the contract this whole exercise existed to preserve.</p>
+  <p data-i18n="en-p3">The most instructive moment was a refusal. The analyser that had to confirm no client was still calling the legacy paths returned <code>VERDICT=INCOMPLETE_SOURCE</code> instead of <code>PASS</code>. It had seen zero compatibility events and zero legacy requests &mdash; but only from an idle local instance, and its own rule is that a local-idle window is not evidence about production.</p>
+  <p data-i18n="en-p4">The way past it was not to relax the rule. It was an explicit human attestation about who the remaining consumers actually were, encoded so the gate could check it rather than take it on trust:</p>
   <pre><code>RETIREMENT_EVIDENCE_SOURCE=external-consumer
 RETIREMENT_EVIDENCE_WINDOW_HOURS=24.00
 RETIREMENT_EVIDENCE_COMPATIBILITY_EVENTS=0
 RETIREMENT_EVIDENCE_LEGACY_DO_REQUESTS=0
 RETIREMENT_EVIDENCE_VERDICT=PASS_ZERO_LEGACY_TRAFFIC</code></pre>
-  <p>A gate that can only pass is a decoration. This one could block the thing everybody wanted, and did.</p>
-  <p class="note">Figures are the recorded <code>B3.986</code> cutover evidence, frozen on completion. The application predates its current version-control history &mdash; it lived in Subversion for years before this work began &mdash; so commit counts here measure the migration, not the codebase.</p>
+  <p data-i18n="en-p5">A gate that can only pass is a decoration. This one could block the thing everybody wanted, and did.</p>
+  <p class="note" data-i18n="en-note">Figures are the recorded <code>B3.986</code> cutover evidence, frozen on completion. The application predates its current version-control history &mdash; it lived in Subversion for years before this work began &mdash; so commit counts here measure the migration, not the codebase.</p>
 </section>
 
 <section id="skills">
-  <h2>Why this became a public repository</h2>
-  <p>A method applied six hundred times has to live somewhere other than one person&rsquo;s head. Held informally it drifts: a slice gets migrated without its callers, a status gets rounded up, a verification step gets skipped because the previous route did not need it. All three happened, and the audit that caught them is why the rules ended up in scripts.</p>
-  <p>So the method was written down as <strong>agent skills</strong> &mdash; structured instruction documents an AI coding agent loads when a task matches, carrying the workflow, the task modes, and the guardrails with it. The migration workflow, the quality gate, the Hibernate Criteria conversion, test design for Java and Angular, and production logging are six of them.</p>
-  <p>The application is client-owned and private. The method is not, and it generalises: the same slice-and-catalog discipline applies to any framework migration where the old system has to stay up.</p>
+  <h2 data-i18n="sk-h">Why this became a public repository</h2>
+  <p data-i18n="sk-p1">A method applied six hundred times has to live somewhere other than one person&rsquo;s head. Held informally it drifts: a slice gets migrated without its callers, a status gets rounded up, a verification step gets skipped because the previous route did not need it. All three happened, and the audit that caught them is why the rules ended up in scripts.</p>
+  <p data-i18n="sk-p2">So the method was written down as <strong>agent skills</strong> &mdash; structured instruction documents an AI coding agent loads when a task matches, carrying the workflow, the task modes, and the guardrails with it. The migration workflow, the quality gate, the Hibernate Criteria conversion, test design for Java and Angular, and production logging are six of them.</p>
+  <p data-i18n="sk-p3">The application is client-owned and private. The method is not, and it generalises: the same slice-and-catalog discipline applies to any framework migration where the old system has to stay up.</p>
   <p class="actions">
-    <a class="btn" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener">View agent-skills on GitHub</a>
-    <a class="btn btn-ghost" href="./">Back to CV</a>
+    <a class="btn" href="https://github.com/ViachaslauStrelnikau/agent-skills" rel="noopener" data-i18n="btn-gh">View agent-skills on GitHub</a>
+    <a class="btn btn-ghost" href="./" data-i18n="btn-back">Back to CV</a>
   </p>
 </section>
 
 </div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Language switch. English lives in the markup above, so the page is complete
+   and indexable with JavaScript disabled. Russian lives in the RU table below
+   and is swapped in per data-i18n key. Choice is remembered in localStorage
+   and can be forced with ?lang=ru / ?lang=en.
+   --------------------------------------------------------------------------- */
+(function () {
+  var META = {
+    en: {
+      title: 'Case study \u2014 Removing Struts 2 from a live application',
+      desc: 'How Struts 2 was removed from a large legacy Java web application: 667 routes moved to Spring MVC one slice at a time, with no rewrite and no downtime. Completed 2026-08-29.'
+    },
+    ru: {
+      title: 'Кейс \u2014 удаление Struts 2 из работающего приложения',
+      desc: 'Как Struts 2 был удалён из большого legacy Java-веб-приложения: 667 маршрутов переведены на Spring MVC по одному срезу за раз, без переписывания и без простоя. Завершено 29.08.2026.'
+    }
+  };
+
+  var RU = {};
+
+  RU['back'] = '\u2190 Вячеслав Стрельников \u2014 резюме';
+  RU['role'] = 'Удаление фреймворка из работающего корпоративного приложения \u2014 по одному маршруту за раз';
+  RU['tagline'] = 'Кейс об инкрементальной модернизации legacy-системы \u2014 метод, ограничители и результат.';
+  RU['done'] = '<strong>Завершено 29.08.2026.</strong> 667 маршрутов, 68 дней, 1078 пронумерованных коммитов миграции, без переписывания с нуля.';
+  RU['btn-skills'] = 'Навыки, которые из этого выросли';
+
+  RU['ctx-h'] = 'Задача';
+  RU['ctx-p1'] = 'Большое, много лет живущее корпоративное Java-приложение в логистике и обработке грузов при пересечении границы. Сотни Struts 2 <code>.do</code>-экшенов, слой данных на Hibernate 3, фронтенд на Ext JS, JSP-представления и конфигурация Spring Security, разраставшаяся годами. Реальные пользователи в системе каждый рабочий день.';
+  RU['ctx-p2'] = 'Фреймворк давно вышел из поддержки и блокировал за собой любое обновление зависимостей. Очевидный ответ \u2014 переписать \u2014 был недоступен: не было второй команды, которая вела бы старую систему, пока строится новая, не было бюджета на простой и не было полной спецификации того, что приложение на самом деле делает. Поведение <em>и было</em> спецификацией, и существовало только в коде.';
+  RU['ctx-p3'] = 'Поэтому ограничение поставили наоборот: приложение остаётся в работе и ведёт себя точно так же, а фреймворк под ним заменяется по одному маршруту за раз.';
+
+  RU['con-h'] = 'Что должно было означать &laquo;идентично&raquo;';
+  RU['con-p1'] = '&laquo;Сохранить поведение&raquo; \u2014 бесполезно расплывчатая формулировка, пока не выписано, что именно наблюдаемо. Для этой миграции контракт был задан явно, и всё перечисленное должно было пережить перенос маршрута:';
+  RU['con-list'] = [
+    '<li>URL и HTTP-метод, включая wildcard-шаблоны экшенов</li>',
+    '<li>Имена и форматы параметров запроса \u2014 вплоть до legacy-парсеров дат, принимающих шесть разных форматов</li>',
+    '<li>Форма тела ответа \u2014 включая legacy-псевдо-JSON-конверт, отдаваемый как <code>text/html</code>, со всеми его особенностями</li>',
+    '<li>Коды состояния при ошибке и точный экранированный payload ошибки, который разбирают клиенты</li>',
+    '<li>Сообщения валидации, редиректы, cookie и обработка локали</li>',
+    '<li>Семантика сессии и права на каждую операцию</li>',
+    '<li>Побочные эффекты: что сохраняется, архивируется, считается или генерируется</li>'
+  ].join('');
+  RU['con-note'] = 'Модернизация самого Spring, версии языка Java и контейнера была отдельной, более поздней работой. Если бы её сложили сюда, каждая регрессия стала бы неоднозначной \u2014 это перенос маршрута или обновление? Целью был уже присутствующий в приложении базовый уровень Spring MVC 3.2, а не Spring сегодняшнего дня.';
+
+  RU['sl-h'] = 'Единица работы: функциональный срез';
+  RU['sl-p1'] = 'Миграция никогда не переносила &laquo;контроллер&raquo;. Она переносила <strong>маршрут вместе со всем, что его вызывает</strong>: JSP, каждый вызов из Ext JS, любого внешнего потребителя и тесты. Маршрут, перенесённый без своих вызывающих, \u2014 это маршрут с двумя реализациями и без владельца.';
+  RU['sl-p2'] = 'Каждый срез проходил в фиксированном порядке:';
+  RU['sl-list'] = [
+    '<li><strong>Сначала характеризация.</strong> Прогнать живой legacy-маршрут и записать его фактический контракт \u2014 не то, что код по виду делает. Характеризационные тесты пишутся <em>до</em> любых изменений, чтобы описывать старое поведение, а не узаконивать новое.</li>',
+    '<li><strong>Заменить экшен тонким Spring-контроллером</strong>, делегирующим в сервисы, с явными моделями запроса, ответа и представления.</li>',
+    '<li><strong>Перевести клиентов тем же изменением.</strong> Struts-теги, обращения к ValueStack и имена экшенов уходят из JSP и из JavaScript.</li>',
+    '<li><strong>Проверить, затем вывести из эксплуатации.</strong> Struts-маппинги, фильтры и JAR-ы удаляются только после того, как оба маршрута проходят проверку, а трафик подтверждает, что legacy-путь мёртв.</li>'
+  ].join('');
+  RU['sl-p3'] = 'Размер срезов ограничивался намеренно: не более восьми read-only JSON-эндпоинтов \u2014 или пяти для всего, что меняет состояние, загружает или отдаёт файлы, рендерит JSP или касается безопасности. Срез, который целиком укладывается в голове, \u2014 это срез, который можно доказать.';
+
+  RU['cp-h'] = 'Совместимость через forward, а не через редиректы';
+  RU['cp-p1'] = 'Старые URL нельзя просто убрать \u2014 закладки, закешированный JavaScript, интеграции и клиенты, инвентаря которых ни у кого нет, продолжают их вызывать. Обычный рефлекс \u2014 HTTP-редирект. Это неверный инструмент: редирект может изменить метод, потерять тело, заново запустить аутентификацию и поменять код состояния, который видит вызывающий. Любое из этого \u2014 изменение поведения в костюме совместимости.';
+  RU['cp-p2'] = 'Вместо этого реестр сопоставлял каждый legacy-путь \u2014 а там, где экшен мультиплексировал по параметру-селектору, каждую отдельную операцию \u2014 с <strong>внутренним серверным forward</strong> на ту же самую Spring-нативную реализацию, которую использовал канонический маршрут. Одна реализация, две двери. Вызывающий не мог определить, через какую дверь он вошёл.';
+  RU['cp-p3'] = 'Алиас оставался активным, пока хоть один зарегистрированный клиент был в ожидании, и выводился из эксплуатации по факту \u2014 по окну наблюдения без трафика, \u2014 а не по дате в плане.';
+  RU['cp-p4'] = 'Весь этот слой по замыслу был строительными лесами. Он вырос до <strong>815 активных алиасов</strong> на пике и сошёл до нуля к моменту cutover; файла реестра в репозитории больше нет.';
+  RU['cp-note'] = 'Перенесённый маршрут должен был быть Spring-нативным от начала до конца. Spring-контроллер, который тянется обратно в бин Struts-экшена, ничего не перенёс \u2014 он добавил слой. Это правило обеспечивали контрактные тесты, а не добрые намерения.';
+
+  RU['cat-h'] = 'Как сделать прогресс проверяемым';
+  RU['cat-p1'] = 'На таком масштабе трудная задача \u2014 не перенести маршрут. Трудно через шесть недель знать, какие маршруты действительно перенесены, какие перенесены наполовину и какие на это есть доказательства. Память и сообщения коммитов этого не выдерживают.';
+  RU['cat-p2'] = 'У каждого маршрута есть запись: legacy-шаблон, канонический путь, режим совместимости, контракт запроса, контракт ответа, безопасность, побочные эффекты, точный список изменённых файлов клиента, покрывающие тесты и \u2014 самое важное поле \u2014 что осталось непроверенным.';
+  RU['cat-p3'] = 'Статус \u2014 это <strong>закрытый словарь</strong>, а не свободный текст, поэтому прогресс нельзя раздуть прилагательными:';
+  RU['cat-table'] = [
+    '<thead><tr><th>Статус</th><th>Значение</th></tr></thead>',
+    '<tbody>',
+    '<tr><td><code>inventory-pending</code></td><td>Известен, ещё не охарактеризован</td></tr>',
+    '<tr><td><code>partially-implemented</code></td><td>Часть операций перенесена, остальные в ожидании</td></tr>',
+    '<tr><td><code>implemented</code></td><td>Маршрутом владеет Spring; владение подтверждено в исходниках</td></tr>',
+    '<tr><td><code>implemented-verified</code></td><td>&hellip; и его покрывают точечные тесты</td></tr>',
+    '<tr><td><code>implemented-live-verified</code></td><td>&hellip; и он проверен в запущенном экземпляре</td></tr>',
+    '<tr><td><code>retired</code></td><td>legacy-алиас совместимости удалён</td></tr>',
+    '</tbody>'
+  ].join('');
+  RU['cat-p4'] = 'Маршрут не может находиться в терминальном статусе, пока есть незакрытые доказательства. Всё недоказанное остаётся видимым \u2014 в нетерминальном статусе или в явном поле <code>remaining</code>. Каталогу разрешено говорить, что работа не закончена, \u2014 именно это делает его достойным чтения.';
+  RU['cat-note'] = 'Это не было бесплатно. Аудит в середине проекта обнаружил, что словарь незаметно развалился: в записи проникло около 180 различных значений <code>status:</code>. Исправлением стало закрепить шесть разрешённых значений в скрипте-валидаторе, а не в документе \u2014 единственное место, где правило выживает при встрече с шестью сотнями файлов.';
+
+  RU['g-h'] = 'Проверка как отдельная роль';
+  RU['g-p1'] = 'Тот, кто реализует срез, \u2014 худший из доступных судей того, работает ли он. Поэтому приёмка была отдельным шагом со своими правилами и выполнялась против <em>запущенного</em> приложения, а не против диффа: точечный review по правилам проекта, минимальный полезный набор сборки и тестов, HTTP-проверка каждой операции, браузерные end-to-end проверки там, где важна интеграция с UI, и проверки персистентности для всего, что меняет состояние.';
+  RU['g-p2'] = 'Она возвращает ровно один из трёх результатов, и ей запрещено трогать исходный код, чтобы улучшить свой же результат:';
+  RU['g-table'] = [
+    '<thead><tr><th>Результат</th><th>Значение</th></tr></thead>',
+    '<tbody>',
+    '<tr><td><code>PASS</code></td><td>Перенесённая функциональность доказуемо работает с точки зрения API, клиента или пользователя.</td></tr>',
+    '<tr><td><code>FAIL</code></td><td>Не работает. Блокирует; возвращается в реализацию.</td></tr>',
+    '<tr><td><code>INCOMPLETE</code></td><td>Проверить не удалось \u2014 нет доступа к runtime, внешней системы или учётных данных. Алиасы остаются, срез остаётся в ожидании runtime-проверки.</td></tr>',
+    '</tbody>'
+  ].join('');
+  RU['g-p3'] = '<code>INCOMPLETE</code> \u2014 несущий элемент. Без него каждая непроверяемая проверка тихо превращается в успешную, а каталог становится вымыслом. &laquo;Мы не смогли это проверить&raquo; \u2014 не то же самое, что &laquo;здесь всё в порядке&raquo;.';
+
+  RU['bc-h'] = 'Было \u2192 стало';
+  RU['bc-p1'] = 'Колонка &laquo;было&raquo; \u2014 собственная базовая линия проекта, зафиксированная 15.07.2026, до переноса первого среза. Колонка &laquo;стало&raquo; \u2014 состояние на момент cutover <code>B3.986</code> 29.08.2026.';
+  RU['d1'] = 'классов Struts-экшенов';
+  RU['d2'] = 'алиасов совместимости';
+  RU['d3'] = 'написанных вызовов <code>.do</code>';
+  RU['d4'] = 'маршрутов в каталоге';
+  RU['bc-table'] = [
+    '<thead><tr><th>Измерение</th><th>Было \u2014 15.07.2026</th><th>Стало \u2014 29.08.2026</th></tr></thead>',
+    '<tbody>',
+    '<tr><td>Обработка запроса</td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; <strong>фильтр Struts на <code>/*</code></strong> &rarr; Spring MVC на <code>/rest/*</code></td><td>CORS &rarr; MDC &rarr; Spring Security &rarr; Spring MVC на <code>/rest/*</code></td></tr>',
+    '<tr><td>Маппинги Struts-экшенов</td><td>180 в 45 пакетах, 50 из них wildcard</td><td>0</td></tr>',
+    '<tr><td>Файлы конфигурации Struts</td><td>3</td><td>0</td></tr>',
+    '<tr><td>Java-классы экшенов</td><td>158</td><td>0 \u2014 пакет удалён</td></tr>',
+    '<tr><td>Spring-контроллеры</td><td>1</td><td>466, несущие 468 объявлений <code>@Controller</code> и 632 <code>@RequestMapping</code></td></tr>',
+    '<tr><td>Написанные вызовы <code>.do</code> в Ext JS и JSP</td><td>163</td><td>0</td></tr>',
+    '<tr><td>JSP, использующие Struts-теги</td><td>19</td><td>0</td></tr>',
+    '<tr><td>JAR-ы Struts, XWork, OGNL, FreeMarker и Velocity</td><td>13 \u2014 включая четыре одновременные версии <code>struts2-core</code></td><td>0, и 0 из 25 575 записей в собранном WAR</td></tr>',
+    '<tr><td>Алиасы совместимости</td><td>\u2014 механизма ещё не существовало</td><td>815 на пике, затем 0</td></tr>',
+    '<tr><td>Java-тест-классы</td><td>0</td><td>1710, зелёные на Java 8 в CI</td></tr>',
+    '<tr><td>Сборка</td><td>Ant и Eclipse над вендоренным <code>lib/</code> из 242 JAR</td><td>Maven</td></tr>',
+    '<tr><td>Каталог маршрутов</td><td>174 маршрута в первой сгенерированной инвентаризации</td><td>667 записей, каждая в терминальном статусе</td></tr>',
+    '</tbody>'
+  ].join('');
+  RU['bc-note'] = 'У слоя совместимости нет значения &laquo;было&raquo;, потому что до миграции он не существовал. Он был построен во время неё, дошёл до 815 активных алиасов и был полностью разобран на cutover \u2014 леса, а не архитектура. Каталог вырос с 174 до 667 по той же причине, по которой работа вообще оказалась выполнимой: один wildcard-экшен на деле оказывался множеством отдельных операций, и каждой требовался свой контракт, прежде чем её можно было переносить.';
+
+  RU['en-h'] = 'Чем это закончилось';
+  RU['m1'] = 'маршрутов, все принадлежат Spring';
+  RU['m2'] = 'legacy-классов экшенов';
+  RU['m3'] = 'активных алиасов совместимости';
+  RU['m4'] = 'Struts-классов в WAR';
+  RU['en-p1'] = 'Все 667 маршрутов прошли финальные ворота вывода из эксплуатации: нет незакрытых доказательств по совместимости, нет активных алиасов, собранный WAR без классов Struts и XWork, зелёный регрессионный прогон на cutover. Ворота \u2014 это скрипт, а не суждение, поэтому они печатают свои счётчики рядом с вердиктом и в любом случае возвращают код выхода:';
+  RU['en-p2'] = 'Регрессия на cutover: <code>OK (1733 tests)</code>. Полный набор тестов на Java 8 теперь выполняется в CI как ворота поставки, а не как артефакт миграции. Выведенные из эксплуатации <code>.do</code>-пути возвращают 404 и анонимным, и аутентифицированным вызывающим, а канонический <code>/rest/system/ping</code> возвращает тело, побайтово идентичное 56 байтам, которые отдавал старый <code>/Ping.do</code>, \u2014 последняя, небольшая проверка того контракта, ради сохранения которого всё это и делалось.';
+  RU['en-p3'] = 'Самым поучительным моментом стал отказ. Анализатор, который должен был подтвердить, что ни один клиент больше не вызывает legacy-пути, вернул <code>VERDICT=INCOMPLETE_SOURCE</code> вместо <code>PASS</code>. Он видел ноль событий совместимости и ноль legacy-запросов \u2014 но только с простаивающего локального экземпляра, а его собственное правило гласит, что окно простоя на локальной машине не является доказательством о production.';
+  RU['en-p4'] = 'Выход был не в том, чтобы ослабить правило. Им стало явное человеческое подтверждение того, кто на самом деле остался потребителем, закодированное так, чтобы ворота могли его проверить, а не принять на веру:';
+  RU['en-p5'] = 'Ворота, которые могут только пропускать, \u2014 это украшение. Эти могли заблокировать то, чего все хотели, и заблокировали.';
+  RU['en-note'] = 'Цифры \u2014 зафиксированные при завершении доказательства cutover <code>B3.986</code>. Приложение старше своей текущей истории контроля версий \u2014 оно годами жило в Subversion до начала этой работы, \u2014 поэтому счёт коммитов здесь измеряет миграцию, а не кодовую базу.';
+
+  RU['sk-h'] = 'Почему это стало публичным репозиторием';
+  RU['sk-p1'] = 'Метод, применённый шестьсот раз, должен жить где-то ещё, кроме головы одного человека. В неформальном виде он дрейфует: срез переносят без его вызывающих, статус округляют вверх, шаг проверки пропускают, потому что предыдущему маршруту он не понадобился. Всё три случилось, и аудит, который это выявил, \u2014 причина, по которой правила оказались в скриптах.';
+  RU['sk-p2'] = 'Поэтому метод был записан как <strong>agent skills</strong> \u2014 структурированные инструкции, которые ИИ-агент для написания кода загружает, когда задача подходит, и несёт вместе с ними процесс, режимы работы и ограничители. Процесс миграции, ворота качества, конвертация Hibernate Criteria, дизайн тестов для Java и Angular и продакшн-логирование \u2014 шесть из них.';
+  RU['sk-p3'] = 'Приложение принадлежит клиенту и закрыто. Метод \u2014 нет, и он обобщается: та же дисциплина срезов и каталога применима к любой миграции фреймворка, где старая система должна оставаться в работе.';
+  RU['btn-gh'] = 'Открыть agent-skills на GitHub';
+  RU['btn-back'] = 'Назад к резюме';
+
+  /* ---- engine ---- */
+  var STORE = 'cs-lang';
+  var nodes = [].slice.call(document.querySelectorAll('[data-i18n]'));
+  var buttons = [].slice.call(document.querySelectorAll('.lang button'));
+  var descTag = document.querySelector('meta[name="description"]');
+
+  /* English is whatever the server sent, captured before anything is swapped. */
+  var EN = {};
+  nodes.forEach(function (n) { EN[n.getAttribute('data-i18n')] = n.innerHTML; });
+
+  function apply(lang) {
+    var dict = lang === 'ru' ? RU : EN;
+    nodes.forEach(function (n) {
+      var key = n.getAttribute('data-i18n');
+      var value = typeof dict[key] === 'string' ? dict[key] : EN[key];
+      if (n.innerHTML !== value) { n.innerHTML = value; }
+    });
+    document.documentElement.lang = lang;
+    document.title = META[lang].title;
+    if (descTag) { descTag.setAttribute('content', META[lang].desc); }
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang ? 'true' : 'false');
+    });
+  }
+
+  function set(lang, remember) {
+    if (lang !== 'ru') { lang = 'en'; }
+    apply(lang);
+    if (remember) { try { localStorage.setItem(STORE, lang); } catch (e) {} }
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener('click', function () { set(b.getAttribute('data-lang'), true); });
+  });
+
+  /* Default is EN: only an explicit ?lang= or a remembered choice changes it. */
+  var initial = 'en';
+  var param = null;
+  try { param = new URLSearchParams(location.search).get('lang'); } catch (e) {}
+  if (param === 'ru' || param === 'en') {
+    initial = param;
+  } else {
+    try {
+      var saved = localStorage.getItem(STORE);
+      if (saved === 'ru' || saved === 'en') { initial = saved; }
+    } catch (e) {}
+  }
+  apply(initial);
+})();
+</script>
 
 <!--
   Final state, frozen on completion.
@@ -358,6 +573,9 @@ RETIREMENT_EVIDENCE_VERDICT=PASS_ZERO_LEGACY_TRAFFIC</code></pre>
   one commit. The migration finished at B3.986 on 2026-08-29, so that job has been retired along
   with it and every figure above is baked into the markup. metrics.json is kept beside this file as
   the pipeline's last export and as a machine-readable record; nothing reads it any more.
+
+  Language: English is in the markup, Russian in the RU table in the script above. EN is the
+  default; a choice is kept in localStorage under cs-lang and can be forced with ?lang=ru.
 -->
 </body>
 </html>
